@@ -1,2 +1,2 @@
-# douyin-api
-simple demo for douyin
+## douyin-api
+开学事情比较多，时间有限能写多少是多少emmm...
