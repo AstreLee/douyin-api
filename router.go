@@ -2,6 +2,7 @@ package main
 
 import (
 	"douyin-api/controller"
+	"douyin-api/middleware/jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,13 +16,13 @@ func initRouter() {
 
 	// the login and register does not need token(middleware)
 	apiRouterLoginRegister := r.Group("/douyin")
-	//apiRouterLoginRegister.POST("/user/register/", controller.Register)
+	apiRouterLoginRegister.POST("/user/register/", controller.Register)
 	apiRouterLoginRegister.POST("/user/login/", controller.Login)
 
 	// register middleware
-	//apiRouter := r.Group("/douyin").Use(jwt.JWT())
+	apiRouter := r.Group("/douyin").Use(jwt.JWT())
 
-	//apiRouter.GET("/user/", controller.UserInfo)
+	apiRouter.GET("/user/", controller.UserInfo)
 	//apiRouter.POST("/user/register/", controller.Register)
 	//apiRouter.POST("/publish/action/", controller.Publish)
 	//apiRouter.GET("/publish/list/", controller.PublishList)
