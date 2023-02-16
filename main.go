@@ -1,17 +1,12 @@
 package main
 
-import (
-	"douyin-api/db"
-	"douyin-api/service"
-)
+import "douyin-api/db"
 
 func main() {
-	go service.RunMessageServer()
-	initRouter(r)
-	// 初始化数据库连接s
+	// init database connection
 	err := db.InitGormDB()
 	if err != nil {
 		return
 	}
-	r.Run(":8080")
+	initRouter()
 }

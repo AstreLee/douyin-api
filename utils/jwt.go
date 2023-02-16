@@ -5,41 +5,39 @@ import (
 	"time"
 )
 
-// jwtSecret 签名密钥
+// jwtSecret private key
 var jwtSecret = "xin"
 
-// Claims Claims保存了用户名和密码还有一些token中的标准配置
+// Claims username、password and some standard info
 type Claims struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	jwt.StandardClaims
 }
 
-// GenerateToken 根据用户名和密码生成token
-// params：username、password：用户名和密码
-// returns：token, error：token/nil 或 空/err
+// GenerateToken generate token according username and password
 func GenerateToken(username, password string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(time.Minute * 30).Unix() // 设置token30分钟后过期
+	expireTime := nowTime.Add(time.Minute * 30).Unix() // set the expired time to 30 minutes
 
 	claims := Claims{
 		Username: username,
 		Password: password,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireTime,        // token过期时间
-			IssuedAt:  time.Now().Unix(), // token发行时间
-			Issuer:    "xin",             // token签发着
+			ExpiresAt: expireTime,        // expired time
+			IssuedAt:  time.Now().Unix(), // issue time
+			Issuer:    "xin",             // issuer
 		},
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(jwtSecret)
+	token, err := tokenClaims.SignedString([]byte(jwtSecret))
 	return token, err
 }
 
-// ParseToken 根据Token字符串解析出Claims，进行获取用户名和密码
+// ParseToken parse token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return []byte(jwtSecret), nil
 	})
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {

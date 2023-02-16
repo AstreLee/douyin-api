@@ -7,29 +7,29 @@ import (
 	"time"
 )
 
-// JWT 自定义中间件
+// JWT define jwt middleware
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var code int
 		var data interface{}
 
-		code = 0 // 获取成功
+		code = 0 // success
 		token := c.Query("token")
 		if token == "" {
-			code = -1 // -1表示获取token失败
+			code = -1 // fail
 		} else {
-			// 解析token
+			// parse token
 			claims, err := utils.ParseToken(token)
 			if err != nil {
-				code = -1 // token解析失败
+				code = -1 // fail to parse token
 			} else if time.Now().Unix() > claims.ExpiresAt {
-				code = -1 // token已经失效
+				code = -1 // token expired
 			}
 		}
 		if code != 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": code,
-				"msg":  "token不存在或失效",
+				"msg":  "token not exists or expired",
 				"data": data,
 			})
 			c.Abort()
