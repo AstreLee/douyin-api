@@ -29,7 +29,7 @@ func Login(c *gin.Context) {
 		})
 	} else {
 		// call func to generate token according username and password
-		token, err := utils.GenerateToken(username, password)
+		token, err := utils.GenerateToken(username)
 		if err == nil {
 			// set httpCode to 200 and the UserLoginResponse
 			c.JSON(http.StatusOK, entity.UserLoginResponse{
@@ -48,7 +48,7 @@ func Register(c *gin.Context) {
 	password := c.Query("password")
 
 	// check if user is already exist
-	_, row := dao.FindByUsernameAndPassword(username, password)
+	_, row := dao.FindByUsername(username)
 	// user exist, tip try again
 	if row != 0 {
 		c.JSON(http.StatusOK, entity.UserLoginResponse{
@@ -66,7 +66,7 @@ func Register(c *gin.Context) {
 			fmt.Println("fail to save user")
 			return
 		}
-		token, err := utils.GenerateToken(username, password)
+		token, err := utils.GenerateToken(username)
 		if err == nil {
 			// set httpCode to 200 and the UserLoginResponse
 			c.JSON(http.StatusOK, entity.UserLoginResponse{
@@ -85,11 +85,27 @@ func UserInfo(c *gin.Context) {
 
 	// get info of user by ID
 	id, _ := strconv.ParseUint(userID, 10, 64)
-	user, row := dao.FindUserByID(uint(id))
+	user, row := dao.FindByID(uint(id))
+	// parsen token, get username
+	claims, _ := utils.ParseToken(c.Query("token"))
+
+	if user.Username == claims.Username {
+		user.IsFollow = false
+	} else {
+		// find the relation in two user
+		isExist := dao.IsFollow(user.Username, claims.Username)
+		// set value of IsFollow
+		user.IsFollow = isExist
+	}
+
 	if row == 0 {
 		fmt.Println("fail to get info of user！")
 		return
 	} else {
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, entity.UserInfo{
+			StatusCode: 0,
+			StatusMsg:  "获取成功！",
+			User:       user,
+		})
 	}
 }
