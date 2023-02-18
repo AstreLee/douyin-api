@@ -18,6 +18,7 @@ func initRouter() {
 	apiRouterLoginRegister := r.Group("/douyin")
 	apiRouterLoginRegister.POST("/user/register/", controller.Register)
 	apiRouterLoginRegister.POST("/user/login/", controller.Login)
+	apiRouterLoginRegister.GET("/feed/", controller.Feed)
 
 	// register middleware
 	apiRouter := r.Group("/douyin").Use(jwt.JWT())

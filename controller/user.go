@@ -29,7 +29,7 @@ func Login(c *gin.Context) {
 		})
 	} else {
 		// call func to generate token according username and password
-		token, err := utils.GenerateToken(username)
+		token, err := utils.GenerateToken(username, user.ID)
 		if err == nil {
 			// set httpCode to 200 and the UserLoginResponse
 			c.JSON(http.StatusOK, entity.UserLoginResponse{
@@ -66,7 +66,7 @@ func Register(c *gin.Context) {
 			fmt.Println("fail to save user")
 			return
 		}
-		token, err := utils.GenerateToken(username)
+		token, err := utils.GenerateToken(username, user.ID)
 		if err == nil {
 			// set httpCode to 200 and the UserLoginResponse
 			c.JSON(http.StatusOK, entity.UserLoginResponse{
@@ -86,14 +86,14 @@ func UserInfo(c *gin.Context) {
 	// get info of user by ID
 	id, _ := strconv.ParseUint(userID, 10, 64)
 	user, row := dao.FindByID(uint(id))
-	// parsen token, get username
+	// parse token, get username
 	claims, _ := utils.ParseToken(c.Query("token"))
 
-	if user.Username == claims.Username {
+	if user.ID == claims.ID {
 		user.IsFollow = false
 	} else {
 		// find the relation in two user
-		isExist := dao.IsFollow(user.Username, claims.Username)
+		isExist := dao.IsFollow(user.ID, claims.ID)
 		// set value of IsFollow
 		user.IsFollow = isExist
 	}

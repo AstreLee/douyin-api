@@ -8,18 +8,20 @@ import (
 // jwtSecret private key
 var jwtSecret = "xin"
 
-// Claims username and some standard info
+// Claims ID、username and some standard info
 type Claims struct {
+	ID       uint   `json:"Id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
-// GenerateToken generate token according username and password
-func GenerateToken(username string) (string, error) {
+// GenerateToken generate token according username
+func GenerateToken(username string, userId uint) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(time.Minute * 30).Unix() // set the expired time to 30 minutes
 
 	claims := Claims{
+		ID:       userId,
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime,        // expired time

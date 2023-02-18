@@ -6,8 +6,11 @@ import (
 )
 
 // IsFollow check if username1 follows username2
-func IsFollow(username1, username2 string) (isExist bool) {
-	result := db.DB.Model(&common.RelationShip{FavoriteName: username1, FavoritedName: username2}).Find(&common.RelationShip{})
+func IsFollow(userId1, userId2 uint) (isExist bool) {
+	result := db.DB.Model(&common.RelationUserUser{
+		FavoriteId:  userId1,
+		FavoritedId: userId2,
+	}).Find(&common.RelationUserUser{})
 	if result.RowsAffected > 0 {
 		isExist = true
 		return
