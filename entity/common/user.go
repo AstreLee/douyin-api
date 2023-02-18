@@ -2,7 +2,7 @@ package common
 
 type User struct {
 	ID              uint   `gorm:"column:id"`
-	Username        string `json:"username"`
+	Username        string `json:"name"`
 	Password        string `json:"password"`
 	FollowCount     uint8  `json:"follow_count"`
 	FollowerCount   uint8  `json:"follower_count"`
